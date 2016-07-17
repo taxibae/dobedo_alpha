@@ -9,19 +9,22 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static('public'));
 
+//Event Listener
+
+
+//Routing
 app.get('/gettingmusic/:name', function(req, res) {
-    var name = req.params.name;
-    fs.readFile('uploaded_data/tricoro.mp3',function (error,data) {
-        if(error){
-            console.log(error);
-            res.send(error);
-        }
-        else{
-            //res.writeHead(200, {'Content-Type' : 'audio/mp3'});
-            //res.end(data);
-            res.send(new Buffer(data).toArrayBuffer());
-        }
+    console.log('gettingmusic req called');
+    res.set({'Content-Type': 'audio/mp3'});
+    var readStream = fs.createReadStream('uploaded_data/'+req.params.name);
+    readStream.on('close', function () {
+        console.log('Stream is closed well');
     });
+    readStream.on('error', function (error) {
+        console.log(error);
+        res.send(undefined);
+    });
+    readStream.pipe(res);
 });
 
 app.listen(52273, function () {

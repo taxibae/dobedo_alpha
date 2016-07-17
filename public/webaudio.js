@@ -1,4 +1,4 @@
-var context;
+var audioContext;
 var receivedAudio;
 window.addEventListener('load', init, false);
 
@@ -14,23 +14,43 @@ function init() {
     }
 }
 
-//jquery Ajax event
+function onError(error){
+    alert(error);
+}
 
+function playSound(buffer){
+    var source = audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioContext.destination);
+    source.start(0);
+}
+
+//jquery Ajax event
 $(document).ready(function () {
+    //Click Submit Button
     $('#music_getmusic').submit(function (e) { 
         e.preventDefault();
-        var musicname = $('#music_musicname').val()
-        $.ajax({
-            type: "GET",
-            url: "/gettingmusic/" + musicname,
-            success: function (response) {
-                audioContext.decodeAudioData(response, function (buffer) {
-                    receivedAudio = buffer;
-                }, function(error){
-                    alert('Decode Error Occured');
-                });
-                $('#service_container').append('Audio is Loaded Successfuly.');
-            }
-        });
+        //url
+        var name = $('#music_musicname').val();
+        
+        //req define
+        var request = new XMLHttpRequest();
+        request.open('GET', '/gettingmusic/'+name, true);
+        request.responseType = 'arraybuffer';
+        
+        // Decode asynchronously
+        request.onload = function() {
+            
+            audioContext.decodeAudioData(request.response, function(buffer) {
+                receivedAudio = buffer;
+            }, onError);
+        }
+        request.send();
+    });
+
+    //Click Play Button
+    $('#music_play').click(function (e) { 
+        e.preventDefault();
+        playSound(receivedAudio);
     });
 });
