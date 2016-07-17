@@ -9,16 +9,9 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static('public'));
 
-app.use(function(req, res, next) {
-    fs.readFile('index.html', function(error, data){
-        if(error){
-            res.send(''+error);
-        }
-        else{
-            res.writeHead(200, {'Content-Type' : 'text/html'});
-            res.end(data);
-        }
-    });
+app.get('/gettingmusic/:name', function(req, res) {
+    var name = req.params.name;
+    res.send(name + ' is successly received');
 });
 
 app.listen(52273, function () {

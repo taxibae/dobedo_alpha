@@ -13,3 +13,18 @@ function init() {
     }
 }
 
+//jquery Ajax event
+
+$(document).ready(function () {
+    $('#music_getmusic').submit(function (e) { 
+        e.preventDefault();
+        var musicname = $('#music_musicname').val()
+        $.ajax({
+            type: "GET",
+            url: "/gettingmusic/" + musicname,
+            success: function (response) {
+                $('#service_container').append('<p>'+ response + '</p>');
+            }
+        });
+    });
+});
