@@ -1,5 +1,6 @@
 var audioContext;
-var receivedAudio;
+var receivedAudio = new Array();
+var source = new Array();
 window.addEventListener('load', init, false);
 
 //Event Declaration
@@ -14,15 +15,10 @@ function init() {
     }
 }
 
-function onError(error){
-    alert(error);
-}
-
-function playSound(buffer){
-    var source = audioContext.createBufferSource();
-    source.buffer = buffer;
-    source.connect(audioContext.destination);
-    source.start(0);
+// UI Event Define
+function addList(name){
+    var output;
+    output+= '<p>' + name + '<input type="checkbox">';
 }
 
 //jquery Ajax event
@@ -40,10 +36,17 @@ $(document).ready(function () {
         
         // Decode asynchronously
         request.onload = function() {
-            
-            audioContext.decodeAudioData(request.response, function(buffer) {
-                receivedAudio = buffer;
-            }, onError);
+            if(!request.response){
+                alert('No Audio File');
+            }
+            else{
+                audioContext.decodeAudioData(request.response, function(buffer) {
+                    receivedAudio.push(buffer);
+                }, function (error){
+                    alert(error);
+                });
+            }
+            console.log('Decode End');
         }
         request.send();
     });
@@ -51,6 +54,18 @@ $(document).ready(function () {
     //Click Play Button
     $('#music_play').click(function (e) { 
         e.preventDefault();
-        playSound(receivedAudio);
+        var i =0;
+        receivedAudio.forEach(function(element) {
+            source[i] = audioContext.createBufferSource();
+            source.buffer = receivedAudio;
+            source.connect(audioContext.destination);
+            i++;
+        }, this);
+
+        source.start(0);
+    });
+    $('#music_stop').click(function (e) { 
+        e.preventDefault();
+        source.stop(0);
     });
 });
