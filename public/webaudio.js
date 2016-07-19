@@ -54,18 +54,20 @@ $(document).ready(function () {
     //Click Play Button
     $('#music_play').click(function (e) { 
         e.preventDefault();
-        var i =0;
+        var i = 0;
         receivedAudio.forEach(function(element) {
             source[i] = audioContext.createBufferSource();
-            source.buffer = receivedAudio;
-            source.connect(audioContext.destination);
+            source[i].buffer = receivedAudio[i];
+            source[i].connect(audioContext.destination);
+            source[i].start(0);
             i++;
         }, this);
-
-        source.start(0);
     });
+
     $('#music_stop').click(function (e) { 
         e.preventDefault();
-        source.stop(0);
+        source.forEach(function(element) {
+            element.stop(0);
+        }, this);
     });
 });
