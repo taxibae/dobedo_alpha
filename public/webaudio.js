@@ -41,6 +41,7 @@ $(document).ready(function () {
             }
             else{
                 audioContext.decodeAudioData(request.response, function(buffer) {
+                    drawAudioWave(buffer);
                     receivedAudio.push(buffer);
                 }, function (error){
                     alert(error);
@@ -71,3 +72,69 @@ $(document).ready(function () {
         }, this);
     });
 });
+
+//Draw
+// The 2nd argument for decodeAudioData
+function drawAudioWave(audioBuffer) {
+    // Get audio binary data for drawing wave
+    var channelLs = new Float32Array(audioBuffer.length);
+    var channelRs = new Float32Array(audioBuffer.length);
+
+    // Stereo?
+    if(audioBuffer.numberOfChannels > 1) {
+        channelLs.set(audioBuffer.getChannelData(0));
+        channelRs.set(audioBuffer.getChannelData(1));
+    }else if(audioBuffer.numberOfChannels> 0) {
+        channelLs.set(audioBuffer.getChannelData(0));
+    }else{
+        window.alert( 'The number of channels is invalid.');
+        return;
+    }
+
+    var canvas = document.querySelector ('canvas');
+    var canvasContext = canvas.getContext ('2d');
+
+    var width = canvas.width;
+    var height = canvas.height;
+
+    // Sampling period
+    var period = 1 / audioContext.sampleRate;
+
+    // This value is the number of samples during 50 msec
+    var n50msec = Math.floor(50 * Math.pow(10, -3) * audioContext.sampleRate);
+
+    // Clear previous data
+    canvasContext.clearRect(0, 0, width, height);
+
+    // Draw audio wave
+    canvasContext.beginPath();
+
+    for(var i = 0, len = channelLs.length; i <len; i ++) {
+        // 50 msec?
+        if ((i % n50msec) === 0) {
+            var x = (i / len) * width;
+            var y = ((1 - channelLs [i]) / 2) * height;
+
+            if (i === 0) {
+                canvasContext.moveTo(x, y);
+            } else {
+                canvasContext.lineTo(x, y);
+            }
+        }
+    }
+    canvasContext.stroke ();
+
+    // Draw text and grid (Y)
+    var textYs = ['1.00', '0.00', '-1.00'];
+
+    for(var i = 0, len = textYs.length; i <len; i ++) {
+        var text = textYs[i];
+        var gy = ((1 - parseFloat(text)) / 2) * height;
+
+        // Draw grid (Y)
+        canvasContext.fillRect(0, gy, width, 1);
+
+        // Draw text (Y)
+        canvasContext.fillText(text, 0, gy);
+    }
+};
