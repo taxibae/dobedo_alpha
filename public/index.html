@@ -15,16 +15,18 @@
     <body>
         <h1>Web Audio API Practice</h1>
         <!--Form-->
-        <form role="form" id="music_getmusic">
+        <form role="form" id="music_getmusic" class="form-inline">
             <div class="form-group">
-                <lable for="name">Music name</lable>
+                <lable for="filename">업로드 할 파일을 찾아보세요</lable>
                 <input type="text" class="form-control" placeholder="name" id="music_musicname">
+                <button type="button" id="music_browse_file" class="btn btn-default">찾아보기</button>
             </div>
-            <div class="form-group">
-                <button type="submit">확인</button>
-            </div>
-        </form>
-
+            <p>
+                <div class="form-group" style="width:200px; margin:auto;">
+                    <button type="submit" class="btn btn-default btn-block">확인</button>
+                </div>
+            </p>
+         </form>
         <!--Service Show-->
         <div id="service_container">
             <canvas id="canvas" width="600" height="130" />
