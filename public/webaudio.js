@@ -73,14 +73,13 @@ $(document).ready(function () {
     });
 });
 
-//Draw
-// The 2nd argument for decodeAudioData
+//Draw function
 function drawAudioWave(audioBuffer) {
-    // Get audio binary data for drawing wave
+    // Get binary data
     var channelLs = new Float32Array(audioBuffer.length);
     var channelRs = new Float32Array(audioBuffer.length);
 
-    // Stereo?
+    // Stereo check
     if(audioBuffer.numberOfChannels > 1) {
         channelLs.set(audioBuffer.getChannelData(0));
         channelRs.set(audioBuffer.getChannelData(1));
@@ -91,8 +90,8 @@ function drawAudioWave(audioBuffer) {
         return;
     }
 
-    var canvas = document.querySelector ('canvas');
-    var canvasContext = canvas.getContext ('2d');
+    var canvas = document.querySelector('canvas');
+    var canvasContext = canvas.getContext('2d');
 
     var width = canvas.width;
     var height = canvas.height;
@@ -100,7 +99,7 @@ function drawAudioWave(audioBuffer) {
     // Sampling period
     var period = 1 / audioContext.sampleRate;
 
-    // This value is the number of samples during 50 msec
+    // The number of samples during 50 msec
     var n50msec = Math.floor(50 * Math.pow(10, -3) * audioContext.sampleRate);
 
     // Clear previous data
@@ -110,31 +109,17 @@ function drawAudioWave(audioBuffer) {
     canvasContext.beginPath();
 
     for(var i = 0, len = channelLs.length; i <len; i ++) {
-        // 50 msec?
-        if ((i % n50msec) === 0) {
+        if ((i % n50msec) === 0){
             var x = (i / len) * width;
             var y = ((1 - channelLs [i]) / 2) * height;
 
-            if (i === 0) {
+            if (i === 0){
                 canvasContext.moveTo(x, y);
-            } else {
+            }
+            else{
                 canvasContext.lineTo(x, y);
             }
         }
     }
     canvasContext.stroke ();
-
-    // Draw text and grid (Y)
-    var textYs = ['1.00', '0.00', '-1.00'];
-
-    for(var i = 0, len = textYs.length; i <len; i ++) {
-        var text = textYs[i];
-        var gy = ((1 - parseFloat(text)) / 2) * height;
-
-        // Draw grid (Y)
-        canvasContext.fillRect(0, gy, width, 1);
-
-        // Draw text (Y)
-        canvasContext.fillText(text, 0, gy);
-    }
 };
